@@ -11,5 +11,13 @@ import sosu from './levelOne/sosu'
 import phone2 from './levelOne/clickPhone';
 import minMax from './levelOne/minMax';
 import gen from './levelOne/generator';
+import stringCompress from './levelTwo/stringCompress';
+import one from './levelTwo/oneTwoFour';
+//import menu from './levelTwo/menuRenew';
 
-console.log(gen([1,2,3,4,5]));
+// console.log(menu(
+//   ["ABCFG", "AC", "CDE", "ACDE", "BCFG", "ACDEH"],
+//   [2,3,4]
+  
+// ));
+
