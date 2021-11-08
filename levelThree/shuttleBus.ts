@@ -13,8 +13,16 @@ export const solution = (
       }
       return timetableNum;
     }, [])
-    .sort((a, b) => a - b);
-  
+    .sort((a, b) => a - b)
+    .slice(0, n * m);
+  const reservationMapInit = () => {
+    const map = new Map<number, number[]>();
+    for (let i = 540; i <= 540 + n * (t - 1); i += t) {
+      map.set(i, []);
+    }
+    return map;
+  };
+
   const reservationData = timetableNum.reduce<{
     reservation: number[][];
     time: number;
@@ -24,69 +32,51 @@ export const solution = (
       if (reservation[reservation.length - 1].length < m) {
         if (item <= time) {
           reservation[reservation.length - 1].push(item);
-          reservationMap.set(time,reservation[reservation.length-1]);
-          return { reservation, time , reservationMap};
+          reservationMap.set(time, reservation[reservation.length - 1]);
+          return { reservation, time, reservationMap };
         }
       }
-      while (item > time) {
+      while (true) {
         time += t;
+        if (time > 540 + t * (n - 1))
+          return { reservation, time, reservationMap };
         if (item <= time) {
           reservation.push([item]);
         } else {
           reservation.push([]);
         }
+
+        if (item <= time) break;
       }
-      reservationMap.set(time,reservation[reservation.length-1]);
+      reservationMap.set(time, reservation[reservation.length - 1]);
       return { reservation, time, reservationMap };
     },
     {
       reservation: [[]],
       time: 540,
-      reservationMap: new Map<number, number[]>(),
+      reservationMap: reservationMapInit(),
     }
   );
-  const reservationEntries = Array.from(reservationData.reservationMap);
-  if(!reservationEntries.length){
 
-    return numberToStringTime(540+t*(n-1));
+  const reservationEntries = Array.from(reservationData.reservationMap);
+
+  if (reservationEntries.length < n) {
+    return numberToStringTime(540 + t * (n - 1));
+  } else {
+    const [lastTime, lastList] =
+      reservationEntries[reservationEntries.length - 1];
+    if (lastList.length < m) {
+      return numberToStringTime(540 + t * (n - 1));
+    }
+
+    return numberToStringTime(lastList[lastList.length - 1] - 1);
   }
-  const [lastTime,lastList] = reservationEntries[reservationEntries.length-1]
-  if(timetableNum.length < n*m){
-    return numberToStringTime(lastList[lastList.length-1]-1 <= 540 ? 540:lastList[lastList.length-1]-1);
-  }else{
-    return numberToStringTime(lastList[lastList.length-1]-1);
-  }
-  
 };
 
-const numberToStringTime = (timeNumber:number) => {
+const numberToStringTime = (timeNumber: number) => {
   const minutes = timeNumber % 60;
-  const hours = (timeNumber - minutes)/60
-  return `${hours<10?`0${hours}`:`${hours}`}:${minutes<10?`0${minutes}`:`${minutes}`}`
-}
-
-const e = solution(1,	1,	5,	["08:00", "08:01", "08:02", "08:03"])
-// const a = solution(10, 10, 2, ["09:10", "09:09", "08:00", "23:59"]); // "09:09"
-
-// const b = solution(2, 1, 2, ["09:00", "09:00", "09:00", "09:00"]);          // "08:59"
-const c =solution(1, 1, 5, ["00:01", "00:01", "00:01", "00:01", "00:01"]); // "00:00"
-// const d = solution(10, 60, 45, [
-//   "23:59",
-//   "23:59",
-//   "23:59",
-//   "23:59",
-//   "23:59",
-//   "23:59",
-//   "23:59",
-//   "23:59",
-//   "23:59",
-//   "23:59",
-//   "23:59",
-//   "23:59",
-//   "23:59",
-//   "23:59",
-//   "23:59",
-//   "23:59",
-// ]); //"18:00
-
-// d
+  const hours = (timeNumber - minutes) / 60;
+  return `${hours < 10 ? `0${hours}` : `${hours}`}:${
+    minutes < 10 ? `0${minutes}` : `${minutes}`
+  }`;
+};
